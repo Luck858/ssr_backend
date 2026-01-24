@@ -4,7 +4,7 @@ import { createCourse, getAllCourses, getCourseById } from '../controllers/cours
 
 const router = express.Router();
 
-router.route('/').post(protect, authorize('admin'), createCourse).get(protect, authorize('admin','teacher'), getAllCourses);
-router.route('/:id').get(protect, authorize('admin','teacher'), getCourseById);
+router.route('/').post(protect, authorize('admin'), createCourse).get(protect, authorize('admin','teacher','student'), getAllCourses);
+router.route('/:id').get(protect, authorize('admin','teacher','student'), getCourseById);
 
 export default router;

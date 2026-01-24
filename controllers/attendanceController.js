@@ -4,7 +4,7 @@ export const createAttendance = async (req, res) => {
   try {
     const { attendanceRecords } = req.body;
 
-    let presentCount = 0;
+    let presentCount = 0
     let absentCount = 0;
 
     attendanceRecords.forEach(record => {

@@ -2,7 +2,7 @@ import Attendance from '../models/Attendance.js';
 
 export const createAttendance = async (req, res) => {
   try {
-    const { attendanceRecords } = req.body;
+    const { attendanceRecords, timetable, date } = req.body;
 
     let presentCount = 0
     let absentCount = 0;
@@ -19,18 +19,49 @@ export const createAttendance = async (req, res) => {
       totalStudents: attendanceRecords.length
     };
 
-    const attendance = new Attendance(attendanceData);
-    await attendance.save();
+    // Check if attendance already exists for this timetable on this date
+    const existingAttendance = await Attendance.findOne({
+      timetable: timetable,
+      date: {
+        $gte: new Date(date),
+        $lt: new Date(new Date(date).getTime() + 24 * 60 * 60 * 1000)
+      }
+    });
 
-    const populatedAttendance = await Attendance.findById(attendance._id)
-      .populate('timetable')
-      .populate('subject', 'subjectName subjectCode')
-      .populate('teacher', 'name email')
-      .populate('department', 'departmentName')
-      .populate('batch', 'batchName')
-      .populate('attendanceRecords.student', 'name email');
+    let result;
+    if (existingAttendance) {
+      // Update existing attendance
+      result = await Attendance.findByIdAndUpdate(
+        existingAttendance._id,
+        {
+          ...attendanceData,
+          updatedAt: Date.now()
+        },
+        { new: true, runValidators: true }
+      )
+        .populate('timetable')
+        .populate('subject', 'subjectName subjectCode')
+        .populate('teacher', 'name email')
+        .populate('department', 'departmentName')
+        .populate('batch', 'batchName')
+        .populate('attendanceRecords.student', 'name email');
+      
+      res.status(200).json({ success: true, data: result, updated: true, message: 'Attendance updated successfully' });
+    } else {
+      // Create new attendance
+      const attendance = new Attendance(attendanceData);
+      await attendance.save();
 
-    res.status(201).json({ success: true, data: populatedAttendance });
+      const populatedAttendance = await Attendance.findById(attendance._id)
+        .populate('timetable')
+        .populate('subject', 'subjectName subjectCode')
+        .populate('teacher', 'name email')
+        .populate('department', 'departmentName')
+        .populate('batch', 'batchName')
+        .populate('attendanceRecords.student', 'name email');
+
+      res.status(201).json({ success: true, data: populatedAttendance, updated: false, message: 'Attendance created successfully' });
+    }
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
@@ -38,13 +69,16 @@ export const createAttendance = async (req, res) => {
 
 export const getAllAttendance = async (req, res) => {
   try {
-    const { teacher, subject, batch, section, date, academicYear } = req.query;
+    const { teacher, subject, batch, section, date, academicYear, timetable } = req.query;
     const filter = {};
 
     if (teacher) filter.teacher = teacher;
     if (subject) filter.subject = subject;
     if (batch) filter.batch = batch;
     if (section) filter.section = section;
+    if (timetable) filter.timetable = timetable;
+    if (academicYear) filter.academicYear = academicYear;
+    
     if (date) {
       const startDate = new Date(date);
       startDate.setHours(0, 0, 0, 0);
@@ -52,7 +86,6 @@ export const getAllAttendance = async (req, res) => {
       endDate.setHours(23, 59, 59, 999);
       filter.date = { $gte: startDate, $lte: endDate };
     }
-    if (academicYear) filter.academicYear = academicYear;
 
     const attendances = await Attendance.find(filter)
       .populate('timetable')

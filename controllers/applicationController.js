@@ -81,7 +81,8 @@ export const createApplication = async (req, res) => {
       data: application,
     });
   } catch (error) {
-    console.error('Error creating application:', error);
+    console.error('❌ Error creating application:', error.message);
+    console.error('Error details:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating application',

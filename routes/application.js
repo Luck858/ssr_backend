@@ -5,9 +5,10 @@ import { protect,teacher,admin,authorize} from '../middleware/auth.js';
 
 router.post('/',protect,authorize('teacher','admin'), createApplication);
 router.get('/',protect,authorize('teacher','admin'), getAllApplications);
-router.get('/:id',protect,authorize('teacher','admin'), getApplicationById);
-
-router.get('/summary/:applicationId', protect,authorize('teacher','admin'),getApplicationBySummary);
+// Allow public access to view application details and summary
+router.get('/:id', getApplicationById);
+router.get('/summary/:applicationId', getApplicationBySummary);
+// Require authentication for office use updates
 router.post('/office-use/:applicationId', protect,authorize('teacher','admin'),updateOfficeUseOnly);
 
 export default router;

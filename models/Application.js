@@ -50,15 +50,8 @@ const applicationSchema = new mongoose.Schema(
       bankAccountNo: String,
     },
     uploadedFiles: {
-      tenthMarksMemo: String,
-      interMarksTC: String,
-      studentAadhar: String,
-      motherAadhar: String,
-      casteCertificate: String,
-      rationRiceCard: String,
-      motherBankPassbook: String,
-      incomeCertificate: String,
-      passportSizePhotos: String,
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
     },
     studyDetails: [
       {
@@ -76,8 +69,8 @@ const applicationSchema = new mongoose.Schema(
       collegePreferences: [String],
     },
     signatureUpload: {
-      studentSignature: String,
-      passportSizePhoto: String,
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
     },
     officeUseOnly: {
   applicationFeePaid: String,

@@ -120,8 +120,30 @@ export const getSections = async (req, res) => {
     const { department, batch, year, academicYear, isActive } = req.query;
     const filter = {};
 
-    if (department) filter.department = department;
-    if (batch) filter.batch = batch;
+    if (department) {
+      // Validate if department is a valid ObjectId
+      if (mongoose.Types.ObjectId.isValid(department)) {
+        filter.department = department;
+      } else {
+        return res.status(400).json({ 
+          success: false, 
+          error: `Invalid department ID: ${department}` 
+        });
+      }
+    }
+    
+    if (batch) {
+      // Validate if batch is a valid ObjectId
+      if (mongoose.Types.ObjectId.isValid(batch)) {
+        filter.batch = batch;
+      } else {
+        return res.status(400).json({ 
+          success: false, 
+          error: `Invalid batch ID: ${batch}` 
+        });
+      }
+    }
+    
     if (year) filter.year = parseInt(year);
     if (academicYear) filter.academicYear = academicYear;
     if (isActive !== undefined) filter.isActive = isActive === 'true';
@@ -141,6 +163,14 @@ export const getSectionsByBatch = async (req, res) => {
   try {
     const { batchId } = req.params;
     const { academicYear } = req.query;
+
+    // Validate if batchId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(batchId)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: `Invalid batch ID: ${batchId}` 
+      });
+    }
 
     const filter = { batch: batchId };
     if (academicYear) filter.academicYear = academicYear;

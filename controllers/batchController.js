@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Batch from '../models/Batch.js';
 import Department from '../models/Departement.js';
 import Semester from '../models/Semester.js';
@@ -186,7 +187,22 @@ await Department.updateMany(
 // ===================== GET ALL BATCHES =====================
 export const getAllBatches = async (req, res) => {
   try {
-    const batches = await Batch.find().populate('departments.departmentId', 'departmentName');
+    const { department } = req.query;
+    const filter = {};
+
+    if (department) {
+      // Validate if department is a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(department)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: `Invalid department ID: ${department}` 
+        });
+      }
+      // Filter batches that contain the specified department
+      filter['departments.departmentId'] = department;
+    }
+
+    const batches = await Batch.find(filter).populate('departments.departmentId', 'departmentName');
     return res.status(200).json({
       success: true,
       data: batches,

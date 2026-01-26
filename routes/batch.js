@@ -6,12 +6,11 @@ const router = express.Router();
 
 router.route('/')
   .post(protect, admin, createBatch)  // create a batch
-  .get(protect, authorize('admin', 'teacher'), getAllBatches);
+  .get(getAllBatches);  // Allow public access to view batches
 
+router.route('/all').get(getAllBatches);  // Allow public access
 
-router.route('/all').get(protect, authorize('admin', 'teacher'), getAllBatches);
+router.route('/department').get(getDepartmentById);  // Allow public access
 
-router.route('/department').get(protect, authorize('admin', 'teacher'), getDepartmentById);
-
-router.route('/:batchId').get(protect, authorize('admin', 'teacher'), getBatchById);
+router.route('/:batchId').get(getBatchById);  // Allow public access
 export default router;

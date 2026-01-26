@@ -4,7 +4,7 @@ import { createCourse, getAllCourses, getCourseById } from '../controllers/cours
 
 const router = express.Router();
 
-router.route('/').post(protect, authorize('admin'), createCourse).get(protect, authorize('admin','teacher','student'), getAllCourses);
-router.route('/:id').get(protect, authorize('admin','teacher','student'), getCourseById);
+router.route('/').post(protect, authorize('admin'), createCourse).get(getAllCourses);  // Allow public access to view courses
+router.route('/:id').get(getCourseById);  // Allow public access
 
 export default router;

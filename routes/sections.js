@@ -14,9 +14,10 @@ const router = express.Router();
 
 router.post('/', protect, admin, createMultipleSections);
 
-router.get('/', protect, getSections);
-router.get('/batch/:batchId', protect, getSectionsByBatch);
-router.get('/:id', protect, getSectionById);
+// Allow public access to view sections (needed for applications)
+router.get('/', getSections);
+router.get('/batch/:batchId', getSectionsByBatch);
+router.get('/:id', getSectionById);
 router.put('/:id', protect, authorize('admin'), updateSection);
 router.delete('/:id', protect, authorize('admin'), deleteSection);
 

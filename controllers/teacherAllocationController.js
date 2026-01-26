@@ -19,14 +19,15 @@ export const createAllocation = async (req, res) => {
 
 export const getAllAllocations = async (req, res) => {
   try {
-    const { teacher, department, batch, academicYear } = req.query;
+    const { teacher, department, batch, academicYear, section } = req.query;
     const filter = { isActive: true };
-    console.log(department, batch, academicYear);
+    console.log(department, batch, academicYear, section);
 
     if (teacher) filter.teacher = teacher;
     if (department) filter.department = department;
     if (batch) filter.batch = batch;
-    if (academicYear) filter.academicYear = academicYear;
+    if (section) filter.section = section;
+    
 
     const allocations = await TeacherAllocation.find(filter)
       .populate('teacher', 'name email department')

@@ -27,7 +27,7 @@ const assignFeesToNewStudent = async (student) => {
       originalAmount: fee.amount,
       discount: 0,
       finalAmount: fee.amount,
-      feeId: fee._id
+      fee: fee._id
     }));
 
     await StudentFee.insertMany(studentFees);

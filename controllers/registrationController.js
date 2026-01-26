@@ -9,6 +9,7 @@ import StudentProfile from "../models/StudentProfile.js";
 const assignFeesToNewStudent = async (student) => {
   try {
     const fees = await Fee.find({
+      course: student.course,
       department: student.department,
       batch: student.batch
     });
@@ -18,6 +19,7 @@ const assignFeesToNewStudent = async (student) => {
     const studentFees = fees.map(fee => ({
       studentId: student._id,
       studentName: student.name,
+      course: student.course,
       department: student.department,
       batch: student.batch,
       semester: fee.semester,
@@ -44,6 +46,7 @@ export const adminRegisterUser = async (req, res) => {
       email,
       password,
       role,
+      course,
       department,
       phone,
       enrollmentId,
@@ -52,6 +55,7 @@ export const adminRegisterUser = async (req, res) => {
       canRegisterStudents,
       section,
       batch,
+      semester,
       designation,
       dob,
       photo,
@@ -100,9 +104,11 @@ export const adminRegisterUser = async (req, res) => {
     };
     // optional fields for students
     if (role === 'student') {
+      if (course) userData.course = course;
       if (enrollmentId) userData.enrollmentId = enrollmentId;
       if (section) userData.section = section;
       if (batch) userData.batch = batch;
+      if (semester) userData.semester = semester;
     }
     if (role === 'teacher') {
       if (employeeId) userData.employeeId = employeeId;

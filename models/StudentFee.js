@@ -11,6 +11,11 @@ const studentFeeSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: true
+    },
     department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Department',
@@ -42,7 +47,7 @@ const studentFeeSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
-    feeId: {
+    fee: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Fee',
       required: true
@@ -50,5 +55,8 @@ const studentFeeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Create a compound unique index on studentId, academicYear, and semester
+studentFeeSchema.index({ studentId: 1, academicYear: 1, semester: 1 }, { unique: true });
 
 export default mongoose.model('StudentFee', studentFeeSchema);

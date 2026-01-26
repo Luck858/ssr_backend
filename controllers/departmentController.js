@@ -118,6 +118,33 @@ export const getDepartmentById = async (req, res) => {
 
 
 
+export const getDepartmentByCourse = async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+
+    const departments = await Department.find({ course: courseId });
+
+    if (!departments || departments.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No departments found for this course',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: departments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+};
+
 export const getAllBatchesByDepartmentId = async (req, res) => {
   try {
     const departmentId = req.params.id;

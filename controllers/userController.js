@@ -66,6 +66,7 @@ export const getUserById = async (req, res) => {
     const data = await User.findById(id)
       .select('-password')
       .populate('batch', 'batchName startDate endDate')
+      .populate('semester', 'semesterName')
       .populate('department', 'departmentName');
 
     if (!data) {

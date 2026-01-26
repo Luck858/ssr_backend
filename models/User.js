@@ -37,10 +37,22 @@ const userSchema = new mongoose.Schema(
       ref: 'Department',
       required: function() { return this.role === 'student' || this.role === 'teacher'; }
     },
+    // Reference to Course collection
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: function() { return this.role === 'student'; }
+    },
     // Reference to Batch collection
     batch: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Batch',
+      required: function() { return this.role === 'student'; }
+    },
+    // Reference to Semester collection
+    semester: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Semester',
       required: function() { return this.role === 'student'; }
     },
     phone: {

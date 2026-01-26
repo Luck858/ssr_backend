@@ -11,6 +11,15 @@ export const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
 
+      // Debug: Check if JWT_SECRET is properly set
+      if (!process.env.JWT_SECRET) {
+        console.error('JWT_SECRET is not set in environment variables');
+        return res.status(401).json({
+          success: false,
+          message: 'Server configuration error',
+        });
+      }
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       req.user = await User.findById(decoded.id).select('-password');
@@ -24,15 +33,14 @@ export const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error('Token verification error:', error.message);
       return res.status(401).json({
         success: false,
         message: 'Not authorized, token failed',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
       });
     }
-  }
-
-  if (!token) {
+  } else {
     return res.status(401).json({
       success: false,
       message: 'Not authorized, no token',

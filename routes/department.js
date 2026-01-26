@@ -4,7 +4,7 @@ import {
   adminRegisterDepartment,
   getAllDepartments,
   getDepartmentById,
-  
+  getDepartmentByCourse,
 } from '../controllers/departmentController.js';
 
 
@@ -12,6 +12,7 @@ import {
 import { protect, admin } from '../middleware/auth.js';
 router.route('/register').post(protect, admin,adminRegisterDepartment);
 router.route('/').get(getAllDepartments).post(protect, admin, adminRegisterDepartment); // Modified route
+router.route('/course/:courseId').get(getDepartmentByCourse);
 router.route('/:id').get(getDepartmentById);
 
 

@@ -215,3 +215,35 @@ export const refreshSignedUrl = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get fresh signed URL for any S3 file
+ * This endpoint can be called anytime a URL is needed
+ */
+export const getFileUrl = async (req, res) => {
+  try {
+    const { s3Key } = req.query;
+
+    if (!s3Key) {
+      return res.status(400).json({
+        success: false,
+        message: 'S3 key is required',
+      });
+    }
+
+    // Generate fresh signed URL valid for 24 hours
+    const signedUrl = await getSignedUrlForS3(s3Key, 24 * 60 * 60);
+
+    return res.status(200).json({
+      success: true,
+      url: signedUrl,
+    });
+  } catch (error) {
+    console.error('Error getting file URL:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error getting file URL',
+      error: error.message,
+    });
+  }
+};

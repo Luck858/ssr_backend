@@ -9,7 +9,7 @@ const seedAdmin = async () => {
   try {
     await connectDB();
 
-    const adminEmail = 'upendra201@gmail.com';
+    const adminEmail = 'bhaskhar@gmail.com';
     const existingAdmin = await User.findOne({ email: adminEmail });
 
     if (existingAdmin) {
@@ -23,7 +23,7 @@ const seedAdmin = async () => {
       password: 'admin@2025',
       role: 'admin',
       department: 'Administration',
-      phone: '1234567890',
+      phone: '1234567897',
       isActive: true,
     });
 

@@ -129,3 +129,86 @@ export const getUsers = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 };
+
+// GET /api/admin/users-with-photos - Fetch all users with photos for gallery
+export const getUsersWithPhotos = async (req, res) => {
+  try {
+    const { limit = 50, page = 1, role } = req.query;
+
+    const filter = {
+      photo: { $exists: true, $ne: null } // Only users with photos
+    };
+    
+    if (role) {
+      filter.role = role;
+    }
+
+    const perPage = parseInt(limit, 10) || 50;
+    const currentPage = parseInt(page, 10) || 1;
+    const skip = (currentPage - 1) * perPage;
+
+    const users = await User.find(filter)
+      .select('name email role photo createdAt department designatio bloodGroup')
+      .populate('department', 'departmentName')
+      .sort({ createdAt: -1 })
+      .limit(perPage)
+      .skip(skip)
+      .exec();
+
+    const total = await User.countDocuments(filter);
+
+    res.status(200).json({ 
+      success: true, 
+      data: users,
+      pagination: {
+        total,
+        page: currentPage,
+        pages: Math.ceil(total / perPage),
+        limit: perPage
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching users with photos:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+};
+
+// GET /api/public/faculty - Public endpoint for faculty directory (no auth required)
+export const getPublicFaculty = async (req, res) => {
+  try {
+    const { limit = 500, page = 1 } = req.query;
+
+    const filter = {
+      role: 'teacher',
+      photo: { $exists: true, $ne: null } // Only teachers with photos
+    };
+
+    const perPage = parseInt(limit, 10) || 500;
+    const currentPage = parseInt(page, 10) || 1;
+    const skip = (currentPage - 1) * perPage;
+
+    const users = await User.find(filter)
+      .select('name email role photo createdAt department designation bloodGroup')
+      .populate('department', 'departmentName')
+      .sort({ createdAt: -1 })
+      .limit(perPage)
+      .skip(skip)
+      .exec();
+
+    const total = await User.countDocuments(filter);
+
+    res.status(200).json({ 
+      success: true, 
+      data: users,
+      pagination: {
+        total,
+        page: currentPage,
+        pages: Math.ceil(total / perPage),
+        limit: perPage
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching public faculty:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+};

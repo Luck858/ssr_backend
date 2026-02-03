@@ -4,6 +4,7 @@ import StudentFee from '../models/StudentFee.js';
 import mongoose from 'mongoose';
 import FacultyProfile from "../models/FacultyProfile.js";
 import StudentProfile from "../models/StudentProfile.js";
+import { uploadToS3 } from '../config/s3.js';
 
 
 const assignFeesToNewStudent = async (student) => {
@@ -117,7 +118,45 @@ export const adminRegisterUser = async (req, res) => {
       // optional teacher fields
       if (designation) userData.designation = designation;
       if (dob) userData.dob = dob;
-      if (photo) userData.photo = photo;
+      
+      // Handle photo upload to S3
+      let photoUrl = null;
+      if (req.file) {
+        // File uploaded via FormData
+        try {
+          const uploadResult = await uploadToS3(
+            req.file.originalname,
+            req.file.buffer,
+            req.file.mimetype,
+            'teacher-photos'
+          );
+          photoUrl = uploadResult.url;
+        } catch (uploadError) {
+          console.error('Error uploading photo to S3:', uploadError);
+          // Continue without photo if upload fails
+        }
+      } else if (photo) {
+        // Fallback: Base64 string (legacy support)
+        try {
+          let photoBuffer;
+          let photoFileName = `${Date.now()}-photo.jpg`;
+          
+          if (typeof photo === 'string' && photo.includes('base64')) {
+            const base64Data = photo.split(',')[1] || photo;
+            photoBuffer = Buffer.from(base64Data, 'base64');
+          } else if (typeof photo === 'string') {
+            photoBuffer = Buffer.from(photo, 'utf-8');
+          } else {
+            photoBuffer = photo;
+          }
+          
+          const uploadResult = await uploadToS3(photoFileName, photoBuffer, 'image/jpeg', 'teacher-photos');
+          photoUrl = uploadResult.url;
+        } catch (uploadError) {
+          console.error('Error uploading photo to S3:', uploadError);
+        }
+      }
+      userData.photo = photoUrl;
       if (bloodGroup) userData.bloodGroup = bloodGroup;
       if (officialDetails) userData.officialDetails = officialDetails;
       if (panNumber) userData.panNumber = panNumber;

@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import {
   adminRegisterUser,
   teacherRegisterStudent,
@@ -10,7 +11,24 @@ import { protect, authorize, checkStudentRegistrationPermission } from '../middl
 
 const router = express.Router();
 
-router.post('/admin/register-user', protect, authorize('admin'), adminRegisterUser);
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === 'photo') {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Photo must be an image file'));
+      }
+    } else {
+      cb(null, true);
+    }
+  }
+});
+
+router.post('/admin/register-user', protect, authorize('admin'), upload.single('photo'), adminRegisterUser);
 
 router.post(
   '/teacher/register-student',

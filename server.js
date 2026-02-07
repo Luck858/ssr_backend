@@ -33,6 +33,7 @@ import studentRouter from './routes/studentRoutes.js';
 import applicationRoutes from './routes/application.js';
 import fileUploadRoutes from './routes/files.js';
 import coordinatorRoutes from './routes/coordinators.js';
+import draftRoutes from './routes/drafts.js';
 
 
 
@@ -126,6 +127,7 @@ app.use('/api/resumes', resumesRouter);
 app.use('/api/problems', problemsRouter);
 app.use('/api/files', fileUploadRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/drafts', draftRoutes);
 
 app.use('/api/sections', sectionRoutes);
 // 404 route for unknown endpoints
@@ -147,7 +149,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
 });
